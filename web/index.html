@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mi bot de trading</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800&family=Inter:wght@400;500;600&display=swap">
+<style>
+/* VOICE everyday: un proyecto personal contado con claridad, para cualquiera
+   IDEA un billete de práctica: dinero que parece real pero lleva el sello "simulado"
+   PICTURE el billete de 1.000 $ con un gráfico de velas impreso y el sello rojo; luego la orden con red, que se mueve con un deslizador
+   COLOUR verde billete #0e4d3a dominante, menta #c9efd9 de apoyo, rojo sello #e0322b como acento; blanco
+   TYPE Archivo 800 para titulares y cifras, Inter para el texto
+   LAYOUT banda verde a todo lo ancho: título arriba, billete grande y cifras al lado; en móvil título, billete, cifras */
+:root{color-scheme:light dark;--bg:light-dark(#ffffff,#0a1611);--ink:light-dark(#10201a,#e8f1ec);--soft:light-dark(#4a5d55,#a9bdb3);--green:#0e4d3a;--green2:light-dark(#0e4d3a,#1f7a5c);--mint:light-dark(#c9efd9,#173a2d);--mintI:light-dark(#0e4d3a,#c9efd9);--red:#e0322b;--line:light-dark(#dbe5df,#22372e);--card:light-dark(#f4f8f5,#11221a);--up:light-dark(#11865c,#4fd19a);--down:light-dark(#d23028,#ff7a70)}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+html{scroll-padding-top:72px}
+body{margin:0;background:var(--bg);color:var(--ink);font:16.5px/1.6 Inter,system-ui,sans-serif;overflow-x:clip}
+h1,h2,h3{font-family:Archivo,Inter,sans-serif;letter-spacing:-.02em;line-height:1.05;text-wrap:balance;margin:0}
+h1{font-size:clamp(34px,5.2vw,58px);font-weight:800}
+h2{font-size:clamp(28px,3.6vw,40px);font-weight:800;margin-bottom:14px}
+h3{font-size:20px;font-weight:700}
+p{margin:0 0 12px;max-width:66ch}
+a{color:inherit}
+.band{padding-block:clamp(36px,5vw,72px);padding-inline:max(5vw,16px)}
+.in{max-width:1240px;margin:0 auto}
+.lead{font-size:18px;color:var(--soft)}
+.num{font-family:Archivo,Inter,sans-serif;font-weight:800;white-space:nowrap;font-variant-numeric:tabular-nums}
+.up{color:var(--up)}.down{color:var(--down)}
+nav{position:sticky;top:0;z-index:5;background:var(--green);color:#fff;border-bottom:1px solid #ffffff22}
+nav .in{display:flex;gap:4px 18px;flex-wrap:wrap;align-items:center;padding:10px max(5vw,16px);max-width:none}
+nav b{font-family:Archivo;font-weight:800;margin-right:auto}
+nav a{text-decoration:none;opacity:.85;font-size:15px;padding:6px 0}
+nav a:hover,nav a:focus-visible{opacity:1;text-decoration:underline}
+.hero{background:var(--green);color:#fff}
+.hero .lead{color:#d8efe2}
+.hero h1 em{font-style:normal;color:#c9efd9}
+.hgrid{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:clamp(20px,4vw,56px);align-items:center;margin-top:28px}
+.note{width:100%;height:auto;display:block;filter:drop-shadow(0 18px 0 #00000033)}
+.stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px 18px}
+.stats div{border-top:1px solid #ffffff40;padding-top:10px}
+.stats .num{font-size:clamp(30px,3.6vw,42px);display:block;line-height:1.1}
+.stats span{font-size:14px;color:#d8efe2}
+.pill{display:inline-block;background:var(--red);color:#fff;font-weight:600;font-size:14px;padding:4px 12px;border-radius:99px;margin-top:18px}
+.two{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(24px,4vw,56px);align-items:start}
+.route{list-style:none;margin:26px 0 0;padding:0;display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:0;counter-reset:s}
+.route li{position:relative;padding:58px 12px 0 0}
+.route li::before{content:"";position:absolute;top:20px;left:0;right:0;height:6px;background:var(--mint)}
+.route li:last-child::before{right:auto;width:22px}
+.route li::after{content:"";position:absolute;top:10px;left:0;width:26px;height:26px;border-radius:50%;background:var(--green2);border:5px solid var(--bg);box-shadow:0 0 0 2px var(--green2)}
+.route time{font-family:Archivo;font-weight:800;font-size:22px;display:block;line-height:1.1}
+.route b{display:block;margin:4px 0 2px}
+.route p{font-size:15px;color:var(--soft)}
+.sim{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px}
+.fig{position:relative;min-height:340px}.fig>svg{position:absolute;inset:0;width:100%;height:100%}
+svg text{font:13px Inter,sans-serif;fill:var(--ink);paint-order:stroke;stroke:var(--card);stroke-width:4px}
+.ctl{display:flex;gap:14px;align-items:center;flex-wrap:wrap;margin-top:12px}
+.ctl label{font-weight:600}
+input[type=range]{flex:1 1 220px;height:44px;accent-color:var(--green2);cursor:pointer}
+input[type=range]:focus-visible{outline:3px solid var(--red);outline-offset:2px;border-radius:6px}
+.out{margin-top:10px;padding:14px 16px;border-radius:10px;background:var(--bg);border:1px solid var(--line);min-height:76px}
+.out .num{font-size:26px}
+.strats{display:grid;grid-template-columns:repeat(auto-fit,minmax(15em,1fr));gap:16px;margin-top:22px}
+.st{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:8px}
+.st svg{width:100%;height:70px;display:block}
+.st p{font-size:15px;margin:0}
+.st dl{display:grid;grid-template-columns:auto auto;gap:2px 12px;margin:6px 0 0;font-size:14px}
+.st dt{color:var(--soft)}.st dd{margin:0;text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.green{background:var(--green);color:#fff}
+.green .lead,.green p{color:#d8efe2}
+.bars{display:grid;grid-template-columns:max-content minmax(0,1fr) max-content;gap:6px 12px;align-items:center;margin-top:18px;font-size:14px}
+.bars .lbl{white-space:nowrap}
+.bars .trk{position:relative;height:22px}
+.bars .trk::before{content:"";position:absolute;left:50%;top:-3px;bottom:-3px;width:1px;background:#ffffff66}
+.bars i{position:absolute;top:0;height:100%;border-radius:3px}
+.bars .v{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap;font-weight:600}
+.open{opacity:.8;font-style:italic}
+.cmp{width:100%;border-collapse:collapse;font-size:15px;margin-top:14px}
+.cmp th,.cmp td{padding:9px 8px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+.cmp th:first-child,.cmp td:first-child{text-align:left;white-space:normal}
+.cmp th{font-weight:600;color:var(--soft);font-size:14px}
+.scroll{overflow-x:auto}
+.lessons{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;margin-top:18px}
+.lessons div{border-top:4px solid var(--green2);padding-top:12px}
+.lessons p{font-size:15.5px}
+.road{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:0;margin-top:22px;border-radius:16px;overflow:hidden;border:1px solid var(--line)}
+.road>div{padding:24px}
+.road .now{background:var(--mint);color:var(--mintI)}
+.road .next{background:var(--card);border-left:2px dashed var(--line)}
+.road h3{margin-bottom:8px}
+.road ul{margin:8px 0 0;padding-left:20px}
+.stack{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.stack span{border:1px solid var(--line);border-radius:99px;padding:5px 12px;font-size:14px;background:var(--card)}
+footer{background:var(--green);color:#d8efe2;font-size:14px}
+footer p{max-width:90ch}
+footer a{color:#fff}
+@media(max-width:900px){.route{grid-template-columns:repeat(3,minmax(0,1fr));row-gap:22px}.route li:nth-child(3)::before{right:auto;width:22px}}
+@media(max-width:760px){.hgrid,.two,.road{grid-template-columns:minmax(0,1fr)}.lessons{grid-template-columns:minmax(0,1fr)}.road .next{border-left:0;border-top:2px dashed var(--line)}}
+@media(max-width:600px){nav a{display:none}.route{grid-template-columns:minmax(0,1fr)}.route li{padding:0 0 18px 44px}.route li::before{top:0;bottom:0;left:10px;right:auto;width:6px;height:auto}.route li::after{top:0}.route li:nth-child(3)::before,.route li:last-child::before{width:6px;bottom:auto;height:22px}.cmp{font-size:13px}.cmp th,.cmp td{padding:7px 4px}}
+@media(prefers-reduced-motion:no-preference){#stamp{transform-box:fill-box;transform-origin:center;animation:stamp .7s .3s cubic-bezier(.2,1.6,.4,1) both}@keyframes stamp{from{transform:rotate(-14deg) scale(1.8);opacity:0}to{transform:rotate(-14deg) scale(1);opacity:1}}}
+</style>
+</head>
+<body>
+<nav><div class="in"><b>tradingbot</b><a href="#como">Cómo funciona</a><a href="#orden">La orden</a><a href="#estrategias">Estrategias</a><a href="#resultados">Resultados</a><a href="#siguiente">Siguiente paso</a></div></nav>
+
+<header class="hero band">
+<div class="in">
+<h1>Un bot que compra una acción al día, <em>con dinero de mentira</em> (por ahora)</h1>
+<p class="lead" style="margin-top:14px">He programado un bot en Python que cada mañana elige una acción de una lista de 20 grandes empresas de EE. UU., la compra, se pone él mismo un límite de pérdidas y otro de ganancias, y la vende en tres días como mucho. Todo con una cuenta simulada: los precios son reales, el dinero no.</p>
+<div class="hgrid">
+<svg class="note" viewBox="0 0 640 330" role="img" aria-label="Billete de 1.000 dólares con un gráfico de velas y el sello Dinero simulado">
+<defs>
+<clipPath id="nc"><rect x="10" y="10" width="620" height="300" rx="18"/></clipPath>
+<linearGradient id="ng" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e6f5ea"/><stop offset="1" stop-color="#bfe3cc"/></linearGradient>
+</defs>
+<rect x="10" y="10" width="620" height="300" rx="18" fill="url(#ng)"/>
+<g clip-path="url(#nc)" fill="none" stroke="#0e4d3a" stroke-opacity=".13" id="guil"></g>
+<rect x="26" y="26" width="588" height="268" rx="10" fill="none" stroke="#0e4d3a" stroke-width="2"/>
+<rect x="32" y="32" width="576" height="256" rx="7" fill="none" stroke="#0e4d3a" stroke-opacity=".5"/>
+<text x="50" y="80" style="font:800 40px Archivo,sans-serif;fill:#0e4d3a;stroke:none">1.000 $</text>
+<text x="590" y="276" text-anchor="end" style="font:800 40px Archivo,sans-serif;fill:#0e4d3a;stroke:none">1.000 $</text>
+<text x="50" y="104" style="font:600 13px Inter,sans-serif;fill:#0e4d3a;stroke:none">Una operación al día</text>
+<text x="50" y="270" style="font:600 13px Inter,sans-serif;fill:#0e4d3a;stroke:none">Cuenta de práctica · Alpaca</text>
+<rect x="210" y="70" width="230" height="180" rx="10" fill="#0e4d3a" fill-opacity=".08" stroke="#0e4d3a" stroke-opacity=".4"/>
+<g id="candles"></g>
+<g id="stamp" transform="rotate(-14 470 120)">
+<rect x="360" y="92" width="220" height="64" rx="8" fill="#ffffffcc" stroke="#e0322b" stroke-width="5"/>
+<rect x="368" y="100" width="204" height="48" rx="4" fill="none" stroke="#e0322b" stroke-width="1.5"/>
+<text x="470" y="134" text-anchor="middle" style="font:800 26px Archivo,sans-serif;fill:#e0322b;stroke:none;letter-spacing:.02em">SIMULADO</text>
+</g>
+</svg>
+<div>
+<div class="stats">
+<div><span class="num" id="sN">11</span><span>operaciones cerradas en papel desde el 30 de octubre</span></div>
+<div><span class="num" id="sW">64 %</span><span>acabaron en ganancia</span></div>
+<div><span class="num" id="sP">+80,84 $</span><span>de beneficio simulado en total</span></div>
+<div><span class="num">+588 $</span><span>en la prueba sobre un año de datos pasados (250 operaciones)</span></div>
+</div>
+<span class="pill">Ni un euro real invertido todavía</span>
+</div>
+</div>
+</div>
+</header>
+
+<section class="band" id="como">
+<div class="in">
+<h2>Un día del bot, de principio a fin</h2>
+<p class="lead">Lo ejecuta mi Mac solo, con tareas programadas para entrar y para salir. Yo no toco nada; leo el informe.</p>
+<ol class="route">
+<li><time>Primero</time><b>Descarga los precios</b><p>Dos años de datos diarios de 20 acciones: Apple, Nvidia, Amazon, Visa, Exxon…</p></li>
+<li><time>Toca estrategia</time><b>Rota entre cinco</b><p>Cada día usa una estrategia distinta, siempre en el mismo orden, para compararlas en igualdad.</p></li>
+<li><time>Ranking</time><b>Elige la mejor candidata</b><p>Filtra las 20 acciones según la regla del día y se queda con la primera de la lista.</p></li>
+<li><time>9:30</time><b>Compra 1.000 $</b><p>Al abrir la bolsa de Nueva York, en acciones enteras, con una orden que ya lleva su red puesta.</p></li>
+<li><time>Hasta 3 días</time><b>Espera</b><p>Si el precio toca el stop o el objetivo, se vende solo. Si no, sale el tercer día a las 15:50.</p></li>
+<li><time>Después</time><b>Escribe el informe</b><p>Por qué eligió esa acción, el plan, el resultado y una línea en el diario de operaciones.</p></li>
+</ol>
+</div>
+</section>
+
+<section class="band" id="orden" style="background:var(--card);border-block:1px solid var(--line)">
+<div class="in two">
+<div>
+<h2>La clave: cada compra lleva su red de seguridad</h2>
+<p>El bot no compra y reza. Cada orden sale con dos órdenes de venta ya colocadas, lo que en bolsa se llama una <b>orden bracket</b>:</p>
+<p><b class="down">Stop-loss</b>: si el precio cae hasta aquí, vende y acepta una pérdida pequeña y conocida.</p>
+<p><b class="up">Take-profit</b>: si sube hasta aquí, vende y se queda la ganancia.</p>
+<p>La distancia no es un número fijo: se calcula con el <b>ATR</b>, lo que una acción suele moverse en un día normal. A una acción nerviosa le deja más margen que a una tranquila.</p>
+<p>Este es un caso real: Mastercard, el 23 de noviembre. Mueve el precio y mira qué habría hecho el bot.</p>
+</div>
+<div class="sim">
+<h3>Mastercard (MA) · 1 acción · estrategia de impulso</h3>
+<div class="fig" style="min-height:300px;margin-top:10px"><svg id="br" aria-label="Precio de entrada, stop-loss y take-profit de la operación de Mastercard"></svg></div>
+<div class="ctl"><label for="px">Precio</label><input type="range" id="px" min="608" max="670" step="0.25" value="660.27"></div>
+<div class="out" id="res" aria-live="polite"></div>
+</div>
+</div>
+</section>
+
+<section class="band" id="estrategias">
+<div class="in">
+<h2>Cinco formas de elegir qué comprar</h2>
+<p class="lead">Cada estrategia es una apuesta distinta sobre cómo se mueven las acciones. Los dibujos son el patrón que busca cada una, no datos reales.</p>
+<div class="strats" id="strats"></div>
+</div>
+</section>
+
+<section class="band green" id="resultados">
+<div class="in two">
+<div>
+<h2>Cuatro semanas en papel: más aciertos que fallos</h2>
+<p class="lead">Cada barra es una operación de unos 1.000 $. Verde, ganó; roja, perdió. Las tres últimas siguen abiertas.</p>
+<div class="bars" id="bars"></div>
+</div>
+<div>
+<h2>Y un año entero hacia atrás</h2>
+<p class="lead">Antes de dejarlo suelto, probé las mismas reglas sobre los precios de noviembre de 2025 a octubre de 2026. Ganó 588 $ en 250 operaciones, pero con meses enteros en negativo por el camino.</p>
+<div class="fig" style="min-height:300px"><svg id="eq" aria-label="Beneficio acumulado en la prueba de un año"></svg></div>
+</div>
+</div>
+</section>
+
+<section class="band">
+<div class="in two">
+<div>
+<h2>Lo que más me ha sorprendido: las estrategias no se ponen de acuerdo</h2>
+<p>En la prueba de un año, la estrategia de impulso fue de las peores. En las cuatro semanas reales, ha sido la mejor. Con el rebote de sobreventa pasa justo al revés.</p>
+<p>No significa que una u otra sea buena: con dos o tres operaciones por estrategia, cualquier resultado es casi ruido. Por eso el bot sigue rotando entre las cinco en lugar de quedarse con la que va ganando.</p>
+</div>
+<div class="scroll">
+<table class="cmp" id="cmp"><thead><tr><th>Estrategia</th><th>Prueba 1 año</th><th>Acierto</th><th>En papel</th><th>Acierto</th></tr></thead><tbody></tbody></table>
+</div>
+</div>
+</section>
+
+<section class="band" style="background:var(--card);border-block:1px solid var(--line)">
+<div class="in">
+<h2>Lo que he aprendido hasta ahora</h2>
+<div class="lessons">
+<div><h3>Automatizar la salida es tan importante como la entrada</h3><p>En 4 de las 11 operaciones la venta programada no se lanzó a su hora y se cerró en la apertura del día siguiente. Funcionó, pero no era el plan.</p></div>
+<div><h3>A veces lo mejor sería no comprar</h3><p>Hay días en que ninguna acción cumple la regla y el bot coge la que más se acerca. Lo marca como «setup débil» en el informe para poder medir si esos días salen peor.</p></div>
+<div><h3>Un año de datos no es una promesa</h3><p>La prueba hacia atrás llegó a ir +915 $ y acabó en +588 $. Su peor racha fue de −332 $ desde un máximo. Hay que poder aguantar eso sin tocar nada.</p></div>
+</div>
+</div>
+</section>
+
+<section class="band" id="siguiente">
+<div class="in">
+<h2>Siguiente paso: dinero real</h2>
+<p class="lead">Lo he construido todo para que el salto sea cambiar de cuenta, no rehacer el bot.</p>
+<div class="road">
+<div class="now"><h3>Ahora · dinero simulado</h3><p>Cuenta de práctica en Alpaca: precios y horarios reales, órdenes que se ejecutan como si fueran de verdad, pero con dinero ficticio.</p><ul><li>Una operación al día desde el 30 de octubre de 2026</li><li>Informe y diario de cada operación</li><li>Resultados por estrategia actualizados</li></ul></div>
+<div class="next"><h3>Después · dinero real</h3><p>El mismo bot, con las mismas reglas, conectado a una cuenta real. Mismos límites de pérdida en cada operación y el mismo diario para comparar papel contra realidad.</p><ul><li>Las claves de la cuenta, fuera del código</li><li>Comparar cada semana lo real con lo simulado</li><li>Publicaré aquí cómo va, gane o pierda</li></ul></div>
+</div>
+<h3 style="margin-top:34px">Con qué está hecho</h3>
+<div class="stack"><span>Python</span><span>pandas</span><span>API de Alpaca (cuenta de práctica)</span><span>yfinance para datos diarios</span><span>launchd en macOS para programarlo</span><span>Claude Code como compañero de programación</span></div>
+<p style="margin-top:16px">También he creado un pequeño «equipo de trading» de skills para Claude Code: un analista que lee los informes de resultados de la SEC, un vigilante de noticias, un gestor de riesgo que bloquea órdenes que rompen mis límites y un ejecutor que nunca envía nada sin mi «sí» explícito.</p>
+</div>
+</section>
+
+<footer class="band">
+<div class="in">
+<p><b style="color:#fff">Aviso.</b> Es un proyecto personal para aprender, no un consejo de inversión ni una recomendación de comprar o vender nada. Los resultados vienen de una cuenta simulada y de pruebas con datos pasados, y no dicen nada de lo que pasará en el futuro.</p>
+<p>Código en <a href="https://github.com/mayhemjacob/tradingbot">github.com/mayhemjacob/tradingbot</a> · Datos hasta el 27 de noviembre de 2026 · <a href="https://jacobomiralles.com">Jacob Miralles</a></p>
+</div>
+</footer>
+
+<script>
+{
+const $=s=>document.querySelector(s);
+const eur=(v,d=2)=>(v>0?'+':v<0?'−':'')+Math.abs(v).toLocaleString('es-ES',{minimumFractionDigits:d,maximumFractionDigits:d})+' $';
+const NS='http://www.w3.org/2000/svg';
+
+/* billete: guilloche y velas */
+let g='';for(let i=0;i<26;i++){g+=`<ellipse cx="320" cy="160" rx="${60+i*11}" ry="${30+i*5}" transform="rotate(${i*7} 320 160)"/>`}
+$('#guil').innerHTML=g;
+let seed=7,rnd=()=>(seed=seed*16807%2147483647)/2147483647,c='',p=200;
+for(let i=0;i<14;i++){const o=p,cl=p+(rnd()-.38)*16;const hi=Math.min(o,cl)-4-rnd()*8,lo=Math.max(o,cl)+4+rnd()*8;const x=224+i*15.5;const up=cl<o;
+c+=`<line x1="${x+4}" x2="${x+4}" y1="${hi}" y2="${lo}" stroke="#0e4d3a" stroke-width="1.5"/><rect x="${x}" y="${Math.min(o,cl)}" width="8" height="${Math.max(2,Math.abs(cl-o))}" fill="${up?'#11865c':'#0e4d3a'}" fill-opacity="${up?1:.35}" stroke="#0e4d3a"/>`;p=cl;}
+$('#candles').innerHTML=c;
+
+/* orden bracket */
+const T={entry:631.43,stop:617.93,target:660.19,qty:1,real:660.27};
+const br=$('#br'),px=$('#px'),res=$('#res');
+const drawBr=()=>{const W=br.clientWidth,H=br.clientHeight,lo=606,hi=672,y=v=>12+(hi-v)/(hi-lo)*(H-24);const v=+px.value;const L=W<420?8:12,R=W-(W<420?112:150);
+const line=(val,col,lab,dash)=>`<line x1="${L}" x2="${R}" y1="${y(val)}" y2="${y(val)}" stroke="${col}" stroke-width="2" ${dash?'stroke-dasharray="6 5"':''}/><text x="${R+8}" y="${y(val)+4}">${lab}</text>`;
+const col=v<=T.stop?'var(--down)':v>=T.target?'var(--up)':'var(--ink)';
+br.innerHTML=`<rect x="${L}" y="${y(hi)}" width="${R-L}" height="${y(T.target)-y(hi)}" fill="var(--up)" opacity=".1"/><rect x="${L}" y="${y(T.stop)}" width="${R-L}" height="${y(lo)-y(T.stop)}" fill="var(--down)" opacity=".1"/>`+
+line(T.target,'var(--up)','Objetivo 660,19')+line(T.entry,'var(--ink)','Compra 631,43',1)+line(T.stop,'var(--down)','Stop 617,93')+
+`<line x1="${(L+R)/2}" x2="${(L+R)/2}" y1="${y(T.entry)}" y2="${y(v)}" stroke="${col}" stroke-width="3"/><circle cx="${(L+R)/2}" cy="${y(v)}" r="9" fill="${col}" stroke="var(--card)" stroke-width="3"/><text x="${(L+R)/2+16}" y="${y(v)+5}" style="font-weight:700">${v.toLocaleString('es-ES',{minimumFractionDigits:2})}</text>`;
+let h;if(v<=T.stop){const r=(T.stop-T.entry)*T.qty;h=`<b class="down">Salta el stop-loss.</b> Vende a 617,93 y pierde <span class="num down">${eur(r)}</span>. Una pérdida pequeña y decidida de antemano.`}
+else if(v>=T.target){const r=(T.target-T.entry)*T.qty;h=`<b class="up">Llega al objetivo.</b> Vende a 660,19 y gana <span class="num up">${eur(r)}</span>. ${Math.abs(v-T.real)<.3?'Es lo que pasó de verdad: salió a 660,27 el 25 de noviembre, +28,84 $.':''}`}
+else{const r=(v-T.entry)*T.qty;h=`<b>Sigue abierta.</b> Si el tercer día a las 15:50 el precio está aquí, vende y el resultado es <span class="num ${r>=0?'up':'down'}">${eur(r)}</span>.`}
+res.innerHTML=h};
+px.addEventListener('input',drawBr);const roB=new ResizeObserver(drawBr);roB.observe(br);
+
+/* estrategias */
+const S=[
+{k:'momentum',t:'Impulso',i:'Compra la acción que más ha subido en 20 días y está por encima de su media de 50. Apuesta: lo fuerte sigue fuerte.',r:'1 ATR / 2 ATR',d:'M4 60 L24 52 L40 54 L60 40 L78 42 L98 28 L116 24 L136 12 L150 8',bt:[50,.36,-82.59],lv:[3,1,89.93]},
+{k:'mean_reversion',t:'Rebote de sobreventa',i:'Compra la acción más castigada (RSI más bajo) que sigue en tendencia de fondo. Apuesta: una caída brusca en una acción sana rebota.',r:'1 ATR / 1 ATR',d:'M4 20 L24 16 L44 22 L64 30 L84 44 L100 56 L114 48 L132 34 L150 26',bt:[50,.58,240.63],lv:[2,0,-57.16]},
+{k:'breakout',t:'Ruptura de 20 días',i:'Compra la acción que cierra en su máximo de 20 días con más volumen del normal. Apuesta: una ruptura con volumen atrae compradores.',r:'1 ATR / 2 ATR',d:'M4 44 L20 36 L36 46 L54 34 L72 44 L90 34 L106 40 L122 30 L136 14 L150 8',bt:[50,.5,217.28],lv:[2,1,33.51]},
+{k:'pullback',t:'Retroceso en tendencia',i:'Compra una acción en clara subida que lleva unos días bajando bajo su media de 10. Apuesta: en una tendencia fuerte, los descansos se compran.',r:'1 ATR / 1,5 ATR',d:'M4 58 L26 46 L48 34 L66 22 L82 30 L96 38 L110 36 L130 20 L150 10',bt:[50,.48,-154.82],lv:[2,.5,20.95]},
+{k:'squeeze',t:'Día tranquilo (NR7)',i:'Compra una acción en subida cuyo último día fue el de rango más estrecho de los últimos 7. Apuesta: tras la calma, un movimiento fuerte.',r:'1 ATR / 2 ATR',d:'M4 50 L20 30 L36 54 L54 36 L70 46 L86 40 L100 43 L112 41 L130 22 L150 8',bt:[50,.58,367.21],lv:[2,.5,-6.39]}];
+const pct=v=>Math.round(v*100)+' %';
+$('#strats').innerHTML=S.map(s=>`<article class="st"><svg viewBox="0 0 154 70" preserveAspectRatio="none" aria-hidden="true"><path d="${s.d}" fill="none" stroke="var(--green2)" stroke-width="3" stroke-linejoin="round" vector-effect="non-scaling-stroke"/></svg><h3>${s.t}</h3><p>${s.i}</p><dl><dt>Stop / objetivo</dt><dd>${s.r}</dd><dt>Prueba 1 año</dt><dd class="${s.bt[2]>=0?'up':'down'}">${eur(s.bt[2])}</dd><dt>En papel</dt><dd class="${s.lv[2]>=0?'up':'down'}">${eur(s.lv[2])}</dd></dl></article>`).join('');
+$('#cmp tbody').innerHTML=S.map(s=>`<tr><td>${s.t}</td><td class="${s.bt[2]>=0?'up':'down'}">${eur(s.bt[2])}</td><td>${pct(s.bt[1])} de ${s.bt[0]}</td><td class="${s.lv[2]>=0?'up':'down'}">${eur(s.lv[2])}</td><td>${pct(s.lv[1])} de ${s.lv[0]}</td></tr>`).join('');
+
+/* operaciones en papel */
+const TR=[['30 oct','WMT',53.2],['2 nov','NVDA',-24.24],['3 nov','MA',23.5],['5 nov','XOM',-23.3],['10 nov','UNH',26.17],['11 nov','MA',7.89],['12 nov','CRM',-32.92],['16 nov','NVDA',10.01],['17 nov','AMZN',44.25],['18 nov','TSLA',-32.56],['23 nov','MA',28.84],['24 nov','XOM',null],['25 nov','CRM',null],['27 nov','AMD',null]];
+const closed=TR.filter(t=>t[2]!==null),tot=closed.reduce((a,t)=>a+t[2],0),mx=Math.max(...closed.map(t=>Math.abs(t[2])));
+$('#sN').textContent=closed.length;$('#sW').textContent=pct(closed.filter(t=>t[2]>0).length/closed.length);$('#sP').textContent=eur(tot);
+$('#bars').innerHTML=TR.map(t=>{if(t[2]===null)return `<span class="lbl open">${t[0]} · ${t[1]}</span><span class="trk"></span><span class="v open">abierta</span>`;const w=Math.abs(t[2])/mx*50;return `<span class="lbl">${t[0]} · ${t[1]}</span><span class="trk"><i style="${t[2]>=0?'left:50%':'right:50%'};width:${w}%;background:${t[2]>=0?'#4fd19a':'#ff7a70'}"></i></span><span class="v">${eur(t[2])}</span>`}).join('');
+
+/* curva de la prueba de un año (cierre semanal) */
+const EQ=[['2025-10-31',-33.98],['2025-11-07',-58.15],['2025-11-14',-70.52],['2025-11-21',-57.64],['2025-12-01',-9.23],['2025-12-08',79.93],['2025-12-15',61.53],['2025-12-22',66.29],['2025-12-30',58.18],['2026-01-07',62.44],['2026-01-14',63.27],['2026-01-22',79.21],['2026-01-29',-65.08],['2026-02-05',-15.9],['2026-02-12',-32.57],['2026-02-20',-17.11],['2026-02-27',156.63],['2026-03-06',185.91],['2026-03-13',225.38],['2026-03-20',193.51],['2026-03-27',253.13],['2026-04-06',421.24],['2026-04-13',479.07],['2026-04-20',677.97],['2026-04-27',655.57],['2026-05-04',618.79],['2026-05-11',615.95],['2026-05-18',646.33],['2026-05-26',681.74],['2026-06-02',715.87],['2026-06-09',617.28],['2026-06-16',614.23],['2026-06-24',537.69],['2026-07-01',631.96],['2026-07-09',757.02],['2026-07-16',703.87],['2026-07-23',709.35],['2026-07-30',658.93],['2026-08-06',731.99],['2026-08-13',764.9],['2026-08-20',680.52],['2026-08-27',729.51],['2026-09-03',779.07],['2026-09-11',915.34],['2026-09-18',849.55],['2026-09-25',794.28],['2026-10-02',830.78],['2026-10-09',765.86],['2026-10-16',713.85],['2026-10-23',646.67],['2026-10-29',587.71]];
+const M=['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+const eq=$('#eq');
+const drawEq=()=>{const W=eq.clientWidth,H=eq.clientHeight,l=W<520?40:52,r=W<520?70:96,t=16,b=28,lo=-200,hi=1000;const x=i=>l+i/(EQ.length-1)*(W-l-r),y=v=>t+(hi-v)/(hi-lo)*(H-t-b);
+let s='';for(let v=lo;v<=hi;v+=200){s+=`<line x1="${l}" x2="${W-r}" y1="${y(v)}" y2="${y(v)}" stroke="#ffffff" stroke-opacity="${v===0?.6:.15}"/><text x="${l-6}" y="${y(v)+4}" text-anchor="end" style="fill:#d8efe2;stroke:none">${v}</text>`}
+const step=W<520?3:2;let last=-1;EQ.forEach((e,i)=>{const m=+e[0].slice(5,7);if(m!==last){last=m;if((m-1)%step===0)s+=`<text x="${x(i)}" y="${H-8}" text-anchor="middle" style="fill:#d8efe2;stroke:none">${M[m-1]}</text>`}});
+const pts=EQ.map((e,i)=>`${x(i)},${y(e[1])}`).join(' ');
+s+=`<polygon points="${x(0)},${y(0)} ${pts} ${x(EQ.length-1)},${y(0)}" fill="#c9efd9" opacity=".22"/><polyline points="${pts}" fill="none" stroke="#c9efd9" stroke-width="3" stroke-linejoin="round"/>`;
+const pk=43,en=EQ.length-1;
+s+=`<circle cx="${x(pk)}" cy="${y(EQ[pk][1])}" r="5" fill="#fff"/><text x="${x(pk)}" y="${y(EQ[pk][1])-10}" text-anchor="end" style="fill:#fff;stroke:none;font-weight:600">máx. +915 $</text>`;
+s+=`<circle cx="${x(en)}" cy="${y(EQ[en][1])}" r="6" fill="#e0322b" stroke="#fff" stroke-width="2"/><text x="${x(en)+10}" y="${y(EQ[en][1])+5}" style="fill:#fff;stroke:none;font-weight:700">+588 $</text>`;
+eq.innerHTML=s};
+const roE=new ResizeObserver(drawEq);roE.observe(eq);
+}
+</script>
+</body>
+</html>
