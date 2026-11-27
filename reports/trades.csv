@@ -12,3 +12,4 @@ date,strategy,symbol,setup,qty,entry_price,exit_price,exit_reason,pnl,pnl_pct,r_
 2026-11-23,momentum,MA,strong,1.0,631.43,660.27,take_profit,28.84,0.045674104809717786,2.048295454545451,closed
 2026-11-24,mean_reversion,XOM,strong,6.0,157.781667,,,,,,open
 2026-11-25,breakout,CRM,"weak (nothing passed the filter, picked the closest)",5.0,189.924,,,,,,open
+2026-11-27,pullback,AMD,"weak (nothing passed the filter, picked the closest)",2.0,,,,,,,open
