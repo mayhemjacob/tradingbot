@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Daily Bot</title><style>
+:root { --bg:#f7f7f5; --card:#fff; --text:#1d1d1b; --muted:#6b6b66; --line:#e4e4df;
+        --up:#1a7f4b; --down:#c0392b; --accent:#2f5bd3; }
+@media (prefers-color-scheme: dark) {
+  :root { --bg:#151514; --card:#1f1f1d; --text:#ecece8; --muted:#9a9a93; --line:#33332f;
+          --up:#4cc38a; --down:#ef6b5b; --accent:#7b9cff; } }
+* { box-sizing:border-box; }
+body { margin:0; background:var(--bg); color:var(--text);
+       font:15px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+main { max-width:960px; margin:0 auto; padding:24px 16px 48px; }
+h1 { font-size:22px; margin:0 0 4px; } h2 { font-size:16px; margin:0 0 12px; }
+.sub { color:var(--muted); margin:0 0 20px; font-size:13px; }
+.card { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:16px; margin-bottom:16px; }
+.kpis { display:grid; grid-template-columns:repeat(auto-fit, minmax(150px, 1fr)); gap:12px; margin-bottom:16px; }
+.kpi { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:12px 14px; }
+.kpi .label { color:var(--muted); font-size:12px; } .kpi .value { font-size:22px; font-weight:600; }
+.kpi .value.text { font-size:15px; line-height:1.3; padding-top:4px; }
+.up { color:var(--up); } .down { color:var(--down); } .muted { color:var(--muted); }
+.table-wrap { overflow-x:auto; }
+table { width:100%; border-collapse:collapse; font-size:13px; font-variant-numeric:tabular-nums; }
+th, td { text-align:left; padding:6px 8px; border-bottom:1px solid var(--line); white-space:nowrap; }
+th { color:var(--muted); font-weight:500; } td.num, th.num { text-align:right; }
+.today { display:grid; grid-template-columns:repeat(auto-fit, minmax(140px, 1fr)); gap:8px 16px; }
+.today div span { display:block; color:var(--muted); font-size:12px; }
+.pill { display:inline-block; padding:1px 8px; border-radius:99px; font-size:12px; border:1px solid var(--line); }
+a { color:var(--accent); } svg { width:100%; height:auto; display:block; }
+</style></head>
+<body><main>
+<h1>Daily Bot</h1>
+<p class="sub">Paper account · $1,000 per trade · held up to 3 days · updated 2026-11-25 21:54</p>
+<div class="kpis"><div class="kpi"><div class="label">Total P&L</div><div class="value up">+$80.84</div></div><div class="kpi"><div class="label">Last trade</div><div class="value up">+$28.84</div></div><div class="kpi"><div class="label">Win rate</div><div class="value ">64%</div></div><div class="kpi"><div class="label">Trades</div><div class="value ">11</div></div><div class="kpi"><div class="label">Best strategy so far</div><div class="value text">Trend Momentum</div></div></div>
+<div class="card"><h2>Latest trade · 2026-11-25</h2>
+<div class="today">
+  <div><span>Stock</span><strong>CRM</strong> × 5</div>
+  <div><span>Strategy</span>20-Day Breakout</div>
+  <div><span>Setup</span>weak</div>
+  <div><span>Entry</span>$189.92</div>
+  <div><span>Stop / target</span>$181.15 / $208.17</div>
+  <div><span>Result</span><span class="pill">open</span></div>
+</div>
+<p class="muted" style="margin:12px 0 0">Why this stock: <a href="2026-11-25_CRM.md">2026-11-25_CRM.md</a></p></div>
+<div class="card"><h2>Open positions (2)</h2><div class="table-wrap"><table>
+<tr><th>Stock</th><th>Strategy</th><th>Bought</th><th class="num">Entry</th><th class="num">Stop</th>
+<th class="num">Target</th><th class="num">Day</th></tr>
+<tr><td><strong>XOM</strong> × 6</td><td>Oversold Bounce</td><td>2026-11-24</td><td class="num">$157.78</td><td class="num">$153.26</td><td class="num">$161.52</td><td class="num">2 of 3</td></tr><tr><td><strong>CRM</strong> × 5</td><td>20-Day Breakout</td><td>2026-11-25</td><td class="num">$189.92</td><td class="num">$181.15</td><td class="num">$208.17</td><td class="num">1 of 3</td></tr>
+</table></div></div>
+<div class="card"><h2>Cumulative P&amp;L</h2><svg viewBox="0 0 900 220" role="img" aria-label="Cumulative P&L">
+  <line x1="80" x2="864" y1="184.0" y2="184.0" stroke="var(--line)" stroke-dasharray="4 4"/>
+  <polyline points="80.0,90.9 158.4,133.3 236.8,92.2 315.2,133.0 393.6,87.2 472.0,73.4 550.4,131.0 628.8,113.4 707.2,36.0 785.6,93.0 864.0,42.5" fill="none" stroke="var(--up)" stroke-width="2.5" stroke-linejoin="round"/>
+  <text x="80" y="210" fill="var(--muted)" font-size="12">2026-10-30</text>
+  <text x="864" y="210" fill="var(--muted)" font-size="12" text-anchor="end">2026-11-23</text>
+  <text x="72" y="40.0" fill="var(--muted)" font-size="12" text-anchor="end">$84.56</text>
+  <text x="72" y="188.0" fill="var(--muted)" font-size="12" text-anchor="end">$0</text>
+  <text x="72" y="188.0" fill="var(--muted)" font-size="12" text-anchor="end">$0.00</text>
+  <text x="864" y="34.5" fill="var(--up)" font-size="13" font-weight="600" text-anchor="end">+$80.84</text>
+</svg></div>
+<div class="card"><h2>By strategy</h2><div class="table-wrap"><table>
+<tr><th>Strategy</th><th class="num">Trades</th><th class="num">Win rate</th><th class="num">P&amp;L</th>
+<th class="num">Avg %</th><th class="num">Avg R</th></tr>
+<tr><td>Trend Momentum</td><td class="num">3</td><td class="num">100%</td><td class="num up">+$89.93</td><td class="num up">+3.72%</td><td class="num">+1.80R</td></tr>
+<tr><td>Oversold Bounce</td><td class="num">2</td><td class="num">0%</td><td class="num down">-$57.16</td><td class="num down">-3.38%</td><td class="num">-0.97R</td></tr>
+<tr><td>20-Day Breakout</td><td class="num">2</td><td class="num">100%</td><td class="num up">+$33.51</td><td class="num up">+2.32%</td><td class="num">+1.03R</td></tr>
+<tr><td>Trend Pullback</td><td class="num">2</td><td class="num">50%</td><td class="num up">+$20.95</td><td class="num up">+1.50%</td><td class="num">+0.30R</td></tr>
+<tr><td>Quiet Day Squeeze (NR7)</td><td class="num">2</td><td class="num">50%</td><td class="num down">-$6.39</td><td class="num down">-0.51%</td><td class="num">+0.04R</td></tr>
+</table></div></div>
+<div class="card"><h2>Recent trades</h2><div class="table-wrap"><table>
+<tr><th>Date</th><th>Stock</th><th>Strategy</th><th>Setup</th><th>Exit</th><th class="num">P&amp;L</th><th class="num">%</th></tr>
+<tr><td>2026-11-23</td><td><strong>MA</strong></td><td>Trend Momentum</td><td>strong</td><td>take_profit</td><td class="num up">+$28.84</td><td class="num up">+4.57%</td></tr>
+<tr><td>2026-11-18</td><td><strong>TSLA</strong></td><td>Quiet Day Squeeze (NR7)</td><td>strong</td><td>stop_loss</td><td class="num down">-$32.56</td><td class="num down">-4.28%</td></tr>
+<tr><td>2026-11-17</td><td><strong>AMZN</strong></td><td>Trend Pullback</td><td>strong</td><td>take_profit</td><td class="num up">+$44.25</td><td class="num up">+5.71%</td></tr>
+<tr><td>2026-11-16</td><td><strong>NVDA</strong></td><td>20-Day Breakout</td><td>weak</td><td>missed_exit_closed_next_open</td><td class="num up">+$10.01</td><td class="num up">+1.05%</td></tr>
+<tr><td>2026-11-12</td><td><strong>CRM</strong></td><td>Oversold Bounce</td><td>strong</td><td>missed_exit_closed_next_open</td><td class="num down">-$32.92</td><td class="num down">-3.82%</td></tr>
+<tr><td>2026-11-11</td><td><strong>MA</strong></td><td>Trend Momentum</td><td>strong</td><td>missed_exit_closed_next_open</td><td class="num up">+$7.89</td><td class="num up">+1.20%</td></tr>
+<tr><td>2026-11-10</td><td><strong>UNH</strong></td><td>Quiet Day Squeeze (NR7)</td><td>strong</td><td>missed_exit_closed_next_open</td><td class="num up">+$26.17</td><td class="num up">+3.27%</td></tr>
+<tr><td>2026-11-05</td><td><strong>XOM</strong></td><td>Trend Pullback</td><td>strong</td><td>stop_loss</td><td class="num down">-$23.30</td><td class="num down">-2.71%</td></tr>
+<tr><td>2026-11-03</td><td><strong>MA</strong></td><td>20-Day Breakout</td><td>strong</td><td>take_profit</td><td class="num up">+$23.50</td><td class="num up">+3.60%</td></tr>
+<tr><td>2026-11-02</td><td><strong>NVDA</strong></td><td>Oversold Bounce</td><td>strong</td><td>stop_loss</td><td class="num down">-$24.24</td><td class="num down">-2.93%</td></tr>
+<tr><td>2026-10-30</td><td><strong>WMT</strong></td><td>Trend Momentum</td><td>strong</td><td>time_exit</td><td class="num up">+$53.20</td><td class="num up">+5.38%</td></tr>
+</table></div></div>
+</main></body></html>

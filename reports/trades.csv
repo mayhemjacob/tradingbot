@@ -1,0 +1,14 @@
+date,strategy,symbol,setup,qty,entry_price,exit_price,exit_reason,pnl,pnl_pct,r_multiple,status
+2026-10-30,momentum,WMT,strong,8.0,123.51,130.16,time_exit,53.2,0.05384179418670554,2.8177966101694887,closed
+2026-11-02,mean_reversion,NVDA,strong,4.0,206.92,200.86,stop_loss,-24.24,-0.029286680842837698,-0.9742765273311856,closed
+2026-11-03,breakout,MA,strong,1.0,652.5,676.0,take_profit,23.5,0.03601532567049803,1.8830128205128178,closed
+2026-11-05,pullback,XOM,strong,5.0,171.73,167.07,stop_loss,-23.3,-0.027135619868398075,-1.0196936542669592,closed
+2026-11-10,squeeze,UNH,strong,2.0,399.745,412.83,missed_exit_closed_next_open,26.17,0.03273336752179512,1.107021996615904,closed
+2026-11-11,momentum,MA,strong,1.0,658.66,666.55,missed_exit_closed_next_open,7.89,0.011978866182856152,0.5441379310344818,closed
+2026-11-12,mean_reversion,CRM,strong,4.0,215.24,207.01,missed_exit_closed_next_open,-32.92,-0.03823638728860812,-0.9625730994152087,closed
+2026-11-16,breakout,NVDA,"weak (nothing passed the filter, picked the closest)",6.0,159.296667,160.965,missed_exit_closed_next_open,10.01,0.010473119315170587,0.16716763527054024,closed
+2026-11-17,pullback,AMZN,strong,3.0,258.266667,273.016667,take_profit,44.25,0.05711151257471414,1.6120218579234962,closed
+2026-11-18,squeeze,TSLA,strong,2.0,380.0,363.72,stop_loss,-32.56,-0.04284210526315779,-1.0181363352095036,closed
+2026-11-23,momentum,MA,strong,1.0,631.43,660.27,take_profit,28.84,0.045674104809717786,2.048295454545451,closed
+2026-11-24,mean_reversion,XOM,strong,6.0,157.781667,,,,,,open
+2026-11-25,breakout,CRM,"weak (nothing passed the filter, picked the closest)",5.0,189.924,,,,,,open
